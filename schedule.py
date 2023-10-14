@@ -1,7 +1,5 @@
-from nonebot import scheduler
-
 import pytz
-import datetime
+from nonebot import scheduler
 
 from .constant import config
 from .group import check_auth
@@ -9,7 +7,8 @@ from .group import check_auth
 tz = pytz.timezone('Asia/Shanghai')
 
 
-@scheduler.scheduled_job('cron', hour='*', minute='02')
+# 每天早上9点01
+@scheduler.scheduled_job('cron', day='1/1', hour='09', minute='01')
 async def check_auth_sdj():
     """
     自动检查Bot已加入的群的授权是否过期  \n
@@ -18,10 +17,6 @@ async def check_auth_sdj():
     v0.1.1后新增特性, 在配置ENABLE_AUTH为0, 则不会自动检查, 并且整个授权系统不生效, 但是可以充值, 生成卡密等,
     以度过刚装上授权系统后的过渡期
     """
-    now = datetime.datetime.now(tz)
-    hour_now = now.hour
-    if hour_now % config.FREQUENCY != 0:
-        return
     if not config.ENABLE_AUTH:
         return
     await check_auth()

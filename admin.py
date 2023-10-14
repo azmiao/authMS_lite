@@ -301,3 +301,13 @@ async def reload_ef(session):
         return
     await util.flush_group()
     await session.send("刷新成功!")
+
+
+@on_command('重载事件过滤器')
+async def reload_ef(session):
+    if session.event.user_id not in hoshino.config.SUPERUSERS:
+        util.log(f'{session.event.user_id}重载事件过滤器, 已拒绝')
+        await session.finish('只有主人才能重载事件过滤器')
+        return
+    await util.reload_event_filter()
+    await session.send("重载成功!")

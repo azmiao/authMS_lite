@@ -332,4 +332,10 @@ async def flush_group():
     fil[".or"][0]["group_id"][".in"] = group_list
     with open(EVENT_FILTER, mode="w", encoding='utf-8') as f:
         json.dump(fil, f, indent=4, ensure_ascii=False)
-    await hoshino.get_bot().reload_event_filter()
+    await reload_event_filter()
+
+
+async def reload_event_filter():
+    bot = hoshino.get_bot()
+    file_str = EVENT_FILTER.replace('\\', '/')
+    await bot.call_action('reload_event_filter', file=file_str)
