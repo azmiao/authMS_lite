@@ -44,7 +44,8 @@
 3. 打开配置样例`config/authMS_lite.py.example`, 按照注释修改为您需要的配置，然后将其改名为`authMS_lite.py`并复制到HoshinoBot统一配置目录下(hoshino/config/)
    > ！！！重点注意：如果您是初次使用authMS, 建议保持默认`ENABLE_AUTH`为`False`, 然后手动给每个群都增加授权时间, 再修改成`True`，然后重启bot
 
-4. 打开go-cqhttp的目录，找到`config.yml`，设置里面的事件过滤器的路径，对应到本项目的`config/filter.json`，例如：`filter: 'C:/HoshinoBot/hoshino/modules/authMS_lite/config/filter.json'`，然后重启go-cqhttp
+4. 打开go-cqhttp的目录，找到`config.yml`，设置里面的事件过滤器的路径，对应到本项目的`config/filter.json`
+   > 例如：`filter: 'C:/HoshinoBot/hoshino/modules/authMS_lite/config/filter.json'`，注意请务必写单正斜杠，不然授权重载无效，然后重启go-cqhttp
 
 5. 开始快乐的玩耍吧
 
