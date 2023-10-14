@@ -128,16 +128,16 @@ async def check_number(group_id=0):
     检查所有群的成员数量是否符合要求, 当传入group_id时则检查传入的群
     """
     if group_id == 0:
-        gnums = await util.get_group_info(info_type='member_count')
+        group_nums = await util.get_group_info(info_type='member_count')
     else:
         __gid = group_id
-        gnums = await util.get_group_info(group_ids=__gid, info_type='member_count')
-    for gid in gnums:
-        if gnums[gid] > config.MAX_GROUP_NUM:
+        group_nums = await util.get_group_info(group_ids=__gid, info_type='member_count')
+    for gid in group_nums:
+        if group_nums[gid] > config.MAX_GROUP_NUM:
             # 人数超过, 检测是否在白名单 
             rt_code = util.allow_list(gid)
             if rt_code == 'not in' or rt_code == 'no_check_auth':
-                util.log(f'群{gid}人数超过设定值, 当前人数{gnums[gid]}, 白名单状态{rt_code}', 'number_check')
+                util.log(f'群{gid}人数超过设定值, 当前人数{group_nums[gid]}, 白名单状态{rt_code}', 'number_check')
                 if group_id == 0:
                     # 检查全部群的情况, 可以自动退出
                     if config.AUTO_LEAVE:

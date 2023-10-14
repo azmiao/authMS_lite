@@ -96,7 +96,7 @@ async def add_time_chat(session):
 
     result = await util.change_authed_time(gid, days)
     msg = await util.process_group_msg(gid, result, title='变更成功, 变更后的群授权信息:\n')
-    # await notify_group(group_id=gid, txt=f'机器人管理员已为本群增加{days}天授权时长，可在群内发送【查询授权】来查看到期时间。')
+    await notify_group(group_id=gid, txt=f'机器人管理员已为本群增加{days}天授权时长，可在群内发送【查询授权】来查看到期时间。')
     await session.finish(msg)
 
 

@@ -13,7 +13,7 @@ class auth_config(object):
 
     # 新群试用天数, 0天意味着机器人将不接受未授权群的入群邀请, 即便
     # 不允许重复试用, 如果群已经在试用列表且试用过期中仍然会被拒绝
-    NEW_GROUP_DAYS = 0
+    NEW_GROUP_DAYS = 7
 
     # 到期前的多少天开始提醒, 设置为0时将不会提醒
     REMIND_BEFORE_EXPIRED = 2

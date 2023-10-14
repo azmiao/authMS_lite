@@ -53,7 +53,7 @@ async def get_nickname(user_id):
     获取用户昵称
     """
     uid = user_id
-    user_info = await nonebot.get_bot().get_stranger_info(user_id=uid)
+    user_info = await hoshino.get_bot().get_stranger_info(user_id=uid)
     return user_info['nickname']
 
 
@@ -184,12 +184,12 @@ async def gun_group(group_id, reason='管理员操作'):
     msg = config.GROUP_LEAVE_MSG
     msg += reason
     try:
-        await nonebot.get_bot().send_group_msg(group_id=gid, message=msg)
+        await hoshino.get_bot().send_group_msg(group_id=gid, message=msg)
     except Exception as e:
         hoshino.logger.error(f'向群{group_id}发送退群消息时发生错误{e}')
     await asyncio.sleep(2)
     try:
-        await nonebot.get_bot().set_group_leave(group_id=gid)
+        await hoshino.get_bot().set_group_leave(group_id=gid)
     except nonebot.CQHttpError:
         return False
     return True
@@ -201,7 +201,7 @@ async def notify_group(group_id, txt):
     """
     gid = group_id
     try:
-        await nonebot.get_bot().send_group_msg(group_id=gid, message=txt)
+        await hoshino.get_bot().send_group_msg(group_id=gid, message=txt)
     except nonebot.CQHttpError:
         return False
     return True
@@ -212,7 +212,7 @@ async def notify_master(txt):
     通知主人
     """
     try:
-        await nonebot.get_bot().send_private_msg(user_id=SUPERUSERS[0], message=txt)
+        await hoshino.get_bot().send_private_msg(user_id=SUPERUSERS[0], message=txt)
     except nonebot.CQHttpError:
         return False
     return True
@@ -332,4 +332,4 @@ async def flush_group():
     fil[".or"][0]["group_id"][".in"] = group_list
     with open(EVENT_FILTER, mode="w", encoding='utf-8') as f:
         json.dump(fil, f, indent=4, ensure_ascii=False)
-    await nonebot.get_bot().call_action("reload_event_filter")
+    await hoshino.get_bot().reload_event_filter()
