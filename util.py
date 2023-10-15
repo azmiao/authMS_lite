@@ -11,7 +11,7 @@ from hoshino.config.__bot__ import SUPERUSERS
 from .constant import group_dict, trial_list, config
 
 # 事件过滤器配置文件目录
-EVENT_FILTER = os.path.join(os.path.dirname(__file__), 'config/filter.json')
+EVENT_FILTER = os.path.abspath(os.path.join(os.path.dirname(__file__), 'config/filter.json'))
 
 
 def check_group(gid):
@@ -110,7 +110,9 @@ async def get_group_list_all():
     """
     bot = hoshino.get_bot()
     self_ids = hoshino.get_self_ids()
-    group_list = await bot.get_group_list(self_id=self_ids[0])
+    group_list = []
+    for self_id in self_ids:
+        group_list += await bot.get_group_list(self_id=self_id)
     return group_list
 
 
@@ -126,12 +128,15 @@ async def process_group_msg(gid, expiration, title: str = '', end='', group_name
     if group_name_sp == '':
         bot = hoshino.get_bot()
         self_ids = hoshino.get_self_ids()
-        # noinspection PyBroadException
-        try:
-            group_info = await bot.get_group_info(self_id=self_ids[0], group_id=gid)
-            group_name = group_info['group_name']
-        except:
-            group_name = '未知(Bot未加入此群)'
+        group_name = '未知(Bot未加入此群)'
+        for sid in self_ids:
+            # noinspection PyBroadException
+            try:
+                group_info = await bot.get_group_info(self_id=sid, group_id=gid)
+                group_name = group_info['group_name']
+                break
+            except:
+                pass
     else:
         group_name = group_name_sp
     time_format = expiration.strftime("%Y-%m-%d %H:%S:%M")
