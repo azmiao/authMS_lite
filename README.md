@@ -61,13 +61,39 @@
    ```
    pip install -r requirements.txt
    ```
-3. 打开配置样例`config/authMS_lite.py.example`, 按照注释修改为您需要的配置，然后将其改名为`authMS_lite.py`并复制到HoshinoBot统一配置目录下`hoshino/config/authMS_lite.py`，
+3. 打开`hoshino/service.py`，修改其中的广播函数为（其实就加了五行）：
+   ```
+   from sqlitedict import SqliteDict # 加这行
+   async def broadcast(self, msgs, TAG='', interval_time=0.5, randomizer=None):
+     bot = self.bot
+     if isinstance(msgs, (str, MessageSegment, Message)):
+         msgs = (msgs, )
+     groups = await self.get_enable_groups()
+     group_dict = SqliteDict(os.path.join(os.path.dirname(__file__), '/modules/authMS_lite/config/group.sqlite'), flag='r') # 加这行
+     for gid, selfids in groups.items():
+         if gid not in group_dict: # 加这行
+             self.logger.error(f"群{gid} 投递{TAG}失败：该群授权已过期") # 加这行
+             continue # 加这行
+         try:
+             for msg in msgs:
+                 await asyncio.sleep(interval_time)
+                 msg = randomizer(msg) if randomizer else msg
+                 await bot.send_group_msg(self_id=random.choice(selfids), group_id=gid, message=msg)
+             l = len(msgs)
+             if l:
+                 self.logger.info(f"群{gid} 投递{TAG}成功 共{l}条消息")
+         except Exception as e:
+             self.logger.error(f"群{gid} 投递{TAG}失败：{type(e)}")
+             self.logger.exception(e)
+   ```
+
+4. 打开配置样例`config/authMS_lite.py.example`, 按照注释修改为您需要的配置，然后将其改名为`authMS_lite.py`并复制到HoshinoBot统一配置目录下`hoshino/config/authMS_lite.py`，
 然后在`hoshino/config/__bot__.py`中的`MODULES_ON`里添加本模块`authMS_lite`
    > ！！！重点注意：如果您是初次启动authMS, 请跳到第4步，如果不是，请重启bot并跳到第5步
 
-4. 若为初次使用，请将`authMS_lite.py`中的`ENABLE_AUTH`先暂时保持为`False`，然后重启bot，到群中手动使用命令【变更授权 123456789+5】给每个需要授权的群都增加授权时间, 完成后再修改配置的`ENABLE_AUTH`为`True`，然后重启bot
+5. 若为初次使用，请将`authMS_lite.py`中的`ENABLE_AUTH`先暂时保持为`False`，然后重启bot，到群中手动使用命令【变更授权 123456789+5】给每个需要授权的群都增加授权时间, 完成后再修改配置的`ENABLE_AUTH`为`True`，然后重启bot
 
-5. 打开go-cqhttp的根目录，找到`config.yml`，设置里面的中间件锚点里的事件过滤器的路径，文件路径对应到本项目的`/config/filter.json`文件即可
+6. 打开go-cqhttp的根目录，找到`config.yml`，设置里面的中间件锚点里的事件过滤器的路径，文件路径对应到本项目的`/config/filter.json`文件即可
    > 例如：`filter: 'C:/HoshinoBot/hoshino/modules/authMS_lite/config/filter.json'`，注意：路径分割符请务必写单正斜杠，不然授权重载无效，填写完成后然后重启go-cqhttp
    > 参考配置，就改`filter`字段即可，注意要写绝对路径
    ```yml
@@ -88,7 +114,7 @@
        bucket: 1     # 令牌桶大小
    ```
 
-6. 开始快乐的玩耍吧
+7. 开始快乐的玩耍吧
 
 ## 贡献
 
