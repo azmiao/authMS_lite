@@ -61,31 +61,35 @@
    ```
    pip install -r requirements.txt
    ```
-3. 打开`hoshino/service.py`，修改其中的广播函数为（其实就加了五行）：
-   ```
-   from sqlitedict import SqliteDict # 加这行
-   async def broadcast(self, msgs, TAG='', interval_time=0.5, randomizer=None):
-     bot = self.bot
-     if isinstance(msgs, (str, MessageSegment, Message)):
-         msgs = (msgs, )
-     groups = await self.get_enable_groups()
-     group_dict = SqliteDict(os.path.join(os.path.dirname(__file__), '/modules/authMS_lite/config/group.sqlite'), flag='r') # 加这行
-     for gid, selfids in groups.items():
-         if gid not in group_dict: # 加这行
-             self.logger.error(f"群{gid} 投递{TAG}失败：该群授权已过期") # 加这行
-             continue # 加这行
-         try:
-             for msg in msgs:
-                 await asyncio.sleep(interval_time)
-                 msg = randomizer(msg) if randomizer else msg
-                 await bot.send_group_msg(self_id=random.choice(selfids), group_id=gid, message=msg)
-             l = len(msgs)
-             if l:
-                 self.logger.info(f"群{gid} 投递{TAG}成功 共{l}条消息")
-         except Exception as e:
-             self.logger.error(f"群{gid} 投递{TAG}失败：{type(e)}")
-             self.logger.exception(e)
-   ```
+3. 打开`hoshino/service.py`进行修改，不修改的话未授权的群也会广播消息：
+    最顶上加上这行
+    ```
+    from sqlitedict import SqliteDict
+    ```
+    然后修改`broadcast()`函数：
+    ```
+    async def broadcast(self, msgs, TAG='', interval_time=0.5, randomizer=None):
+        bot = self.bot
+        if isinstance(msgs, (str, MessageSegment, Message)):
+            msgs = (msgs, )
+        groups = await self.get_enable_groups()
+        group_dict = SqliteDict(os.path.join(os.path.dirname(__file__), '/modules/authMS_lite/config/group.sqlite'), flag='r') # 加这行
+        for gid, selfids in groups.items():
+            if gid not in group_dict: # 加这行
+                self.logger.error(f"群{gid} 投递{TAG}失败：该群授权已过期") # 加这行
+                continue # 加这行
+            try:
+                for msg in msgs:
+                    await asyncio.sleep(interval_time)
+                    msg = randomizer(msg) if randomizer else msg
+                    await bot.send_group_msg(self_id=random.choice(selfids), group_id=gid, message=msg)
+                l = len(msgs)
+                if l:
+                    self.logger.info(f"群{gid} 投递{TAG}成功 共{l}条消息")
+            except Exception as e:
+                self.logger.error(f"群{gid} 投递{TAG}失败：{type(e)}")
+                self.logger.exception(e)
+    ```
 
 4. 打开配置样例`config/authMS_lite.py.example`, 按照注释修改为您需要的配置，然后将其改名为`authMS_lite.py`并复制到HoshinoBot统一配置目录下`hoshino/config/authMS_lite.py`，
 然后在`hoshino/config/__bot__.py`中的`MODULES_ON`里添加本模块`authMS_lite`
