@@ -73,7 +73,7 @@
         if isinstance(msgs, (str, MessageSegment, Message)):
             msgs = (msgs, )
         groups = await self.get_enable_groups()
-        group_dict = SqliteDict(os.path.join(os.path.dirname(__file__), '/modules/authMS_lite/config/group.sqlite'), flag='r') # 加这行
+        group_dict = SqliteDict(os.path.join(os.path.dirname(__file__), 'modules/authMS_lite/config/group.sqlite'), flag='r') # 加这行
         for gid, selfids in groups.items():
             if gid not in group_dict: # 加这行
                 self.logger.error(f"群{gid} 投递{TAG}失败：该群授权已过期") # 加这行
